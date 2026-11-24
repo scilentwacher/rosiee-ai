@@ -56,7 +56,10 @@ small{color:var(--muted)}
   <label for="key">API key</label>
   <input id="key" type="password" autocomplete="off" placeholder="Paste your key">
   <label for="model">Model name</label>
-  <input id="model" autocomplete="off">
+  <input id="model" list="models" autocomplete="off">
+  <datalist id="models"></datalist>
+  <button class="ghost" id="load" type="button" style="margin-top:8px;width:100%">Load available models</button>
+  <small id="loadmsg"></small>
   <label for="sys">Instructions for the AI</label>
   <textarea id="sys" rows="3"></textarea>
   <div class="row">
@@ -67,8 +70,8 @@ small{color:var(--muted)}
 
 <script>
 const PROVIDERS = {
-  groq: {url:"https://api.groq.com/openai/v1/chat/completions", model:"llama-3.3-70b-versatile"},
-  openrouter: {url:"https://openrouter.ai/api/v1/chat/completions", model:"meta-llama/llama-3.3-70b-instruct:free"}
+  groq: {url:"https://api.groq.com/openai/v1/chat/completions", model:"openai/gpt-oss-20b", list:"https://api.groq.com/openai/v1/models"},
+  openrouter: {url:"https://openrouter.ai/api/v1/chat/completions", model:"openrouter/free", list:"https://openrouter.ai/api/v1/models"}
 };
 const $ = id => document.getElementById(id);
 const log = $("log"), input = $("input"), send = $("send"), dlg = $("settings");
@@ -77,6 +80,7 @@ let cfg = {provider:"groq", key:"", model:PROVIDERS.groq.model, sys:"You are Ros
 
 try { Object.assign(cfg, JSON.parse(localStorage.getItem("rossie-cfg") || "{}")); } catch (e) {}
 
+if (cfg.model === "llama-3.3-70b-versatile") cfg.model = PROVIDERS.groq.model;
 function saveCfg(){ try { localStorage.setItem("rossie-cfg", JSON.stringify(cfg)); } catch (e) {} }
 
 function add(cls, text){
@@ -98,6 +102,21 @@ $("cancel").onclick = () => dlg.close();
 $("save").onclick = () => {
   cfg = {provider:$("provider").value, key:$("key").value.trim(), model:$("model").value.trim(), sys:$("sys").value.trim()};
   saveCfg(); dlg.close();
+};
+$("load").onclick = async () => {
+  const p = $("provider").value, key = $("key").value.trim(), msg = $("loadmsg");
+  if (!key) { msg.textContent = "Paste your key first."; return; }
+  msg.textContent = "Loading…";
+  try {
+    const r = await fetch(PROVIDERS[p].list, {headers:{"Authorization":"Bearer " + key}});
+    const d = await r.json();
+    if (!r.ok) throw new Error((d.error && d.error.message) || "Failed (" + r.status + ")");
+    let ids = d.data.map(m => m.id);
+    if (p === "groq") ids = ids.filter(i => !/whisper|guard|tts|orpheus|playai/i.test(i));
+    if (p === "openrouter") ids = ids.filter(i => /:free$|^openrouter\/free$/.test(i));
+    $("models").innerHTML = ids.map(i => '<option value="' + i + '">').join("");
+    msg.textContent = ids.length + " models found. Tap the model box to pick one.";
+  } catch (e) { msg.textContent = "Error: " + e.message; }
 };
 $("clear").onclick = () => { history = []; showEmpty(); };
 
