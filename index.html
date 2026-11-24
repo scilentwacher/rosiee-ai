@@ -37,7 +37,7 @@ small{color:var(--muted)}
 <body>
 <header>
   <h1>Rossie AI</h1>
-  <div><button class="ghost" id="clear">New chat</button> <button class="ghost" id="open">Settings</button></div>
+  <div><button class="ghost" id="clear">New chat</button></div>
 </header>
 <main id="log" aria-live="polite"></main>
 <form id="form">
@@ -45,43 +45,12 @@ small{color:var(--muted)}
   <button id="send" type="submit">Send</button>
 </form>
 
-<dialog id="settings">
-  <h2 style="margin:0 0 4px;font-size:1.1rem">Settings</h2>
-  <small>Your key stays in this browser only.</small>
-  <label for="provider">Provider</label>
-  <select id="provider">
-    <option value="groq">Groq (free tier)</option>
-    <option value="openrouter">OpenRouter (free models)</option>
-  </select>
-  <label for="key">API key</label>
-  <input id="key" type="password" autocomplete="off" placeholder="Paste your key">
-  <label for="model">Model name</label>
-  <input id="model" list="models" autocomplete="off">
-  <datalist id="models"></datalist>
-  <button class="ghost" id="load" type="button" style="margin-top:8px;width:100%">Load available models</button>
-  <small id="loadmsg"></small>
-  <label for="sys">Instructions for the AI</label>
-  <textarea id="sys" rows="3"></textarea>
-  <div class="row">
-    <button class="ghost" id="cancel" type="button">Cancel</button>
-    <button class="primary" id="save" type="button">Save</button>
-  </div>
-</dialog>
 
 <script>
-const PROVIDERS = {
-  groq: {url:"https://api.groq.com/openai/v1/chat/completions", model:"openai/gpt-oss-20b", list:"https://api.groq.com/openai/v1/models"},
-  openrouter: {url:"https://openrouter.ai/api/v1/chat/completions", model:"openrouter/free", list:"https://openrouter.ai/api/v1/models"}
-};
+const PROXY_URL = "https://rossie-ai.shinermathew.workers.dev";
 const $ = id => document.getElementById(id);
-const log = $("log"), input = $("input"), send = $("send"), dlg = $("settings");
+const log = $("log"), input = $("input"), send = $("send");
 let history = [];
-let cfg = {provider:"groq", key:"", model:PROVIDERS.groq.model, sys:"You are Rossie AI, a helpful, friendly assistant. If asked your name, say you are Rossie AI. Keep answers clear and short."};
-
-try { Object.assign(cfg, JSON.parse(localStorage.getItem("rossie-cfg") || "{}")); } catch (e) {}
-
-if (cfg.model === "llama-3.3-70b-versatile") cfg.model = PROVIDERS.groq.model;
-function saveCfg(){ try { localStorage.setItem("rossie-cfg", JSON.stringify(cfg)); } catch (e) {} }
 
 function add(cls, text){
   const d = document.createElement("div");
@@ -89,52 +58,22 @@ function add(cls, text){
   const empty = log.querySelector(".empty"); if (empty) empty.remove();
   log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
 }
-function showEmpty(){
-  log.innerHTML = '<div class="empty">Ask me anything. Add your API key in Settings to start.</div>';
-}
-function openSettings(){
-  $("provider").value = cfg.provider; $("key").value = cfg.key;
-  $("model").value = cfg.model; $("sys").value = cfg.sys; dlg.showModal();
-}
-$("provider").addEventListener("change", e => { $("model").value = PROVIDERS[e.target.value].model; });
-$("open").onclick = openSettings;
-$("cancel").onclick = () => dlg.close();
-$("save").onclick = () => {
-  cfg = {provider:$("provider").value, key:$("key").value.trim(), model:$("model").value.trim(), sys:$("sys").value.trim()};
-  saveCfg(); dlg.close();
-};
-$("load").onclick = async () => {
-  const p = $("provider").value, key = $("key").value.trim(), msg = $("loadmsg");
-  if (!key) { msg.textContent = "Paste your key first."; return; }
-  msg.textContent = "Loading…";
-  try {
-    const r = await fetch(PROVIDERS[p].list, {headers:{"Authorization":"Bearer " + key}});
-    const d = await r.json();
-    if (!r.ok) throw new Error((d.error && d.error.message) || "Failed (" + r.status + ")");
-    let ids = d.data.map(m => m.id);
-    if (p === "groq") ids = ids.filter(i => !/whisper|guard|tts|orpheus|playai/i.test(i));
-    if (p === "openrouter") ids = ids.filter(i => /:free$|^openrouter\/free$/.test(i));
-    $("models").innerHTML = ids.map(i => '<option value="' + i + '">').join("");
-    msg.textContent = ids.length + " models found. Tap the model box to pick one.";
-  } catch (e) { msg.textContent = "Error: " + e.message; }
-};
+function showEmpty(){ log.innerHTML = '<div class="empty">Hi, I’m Rossie AI. Ask me anything.</div>'; }
 $("clear").onclick = () => { history = []; showEmpty(); };
-
 input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = input.scrollHeight + "px"; });
 
 $("form").addEventListener("submit", async e => {
   e.preventDefault();
   const text = input.value.trim(); if (!text) return;
-  if (!cfg.key) { openSettings(); return; }
   input.value = ""; input.style.height = "auto";
   add("me", text); history.push({role:"user", content:text});
   send.disabled = true;
   const wait = add("ai", "…");
   try {
-    const res = await fetch(PROVIDERS[cfg.provider].url, {
+    const res = await fetch(PROXY_URL, {
       method:"POST",
-      headers:{"Content-Type":"application/json", "Authorization":"Bearer " + cfg.key},
-      body: JSON.stringify({model:cfg.model, messages:[{role:"system", content:cfg.sys}, ...history.slice(-20)]})
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({messages: history.slice(-20)})
     });
     const data = await res.json();
     if (!res.ok) throw new Error((data.error && data.error.message) || "Request failed (" + res.status + ")");
@@ -142,11 +81,10 @@ $("form").addEventListener("submit", async e => {
     wait.textContent = reply; history.push({role:"assistant", content:reply});
   } catch (err) {
     wait.remove(); history.pop();
-    add("err", "Error: " + err.message + ". Check your key and model name in Settings.");
+    add("err", "Sorry, something went wrong: " + err.message + ". Please try again.");
   }
   send.disabled = false; log.scrollTop = log.scrollHeight;
 });
-
 showEmpty();
 </script>
 </body>
