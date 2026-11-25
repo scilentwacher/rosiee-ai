@@ -76,6 +76,31 @@ textarea::placeholder{color:var(--muted)}
 .h-title{flex:1;min-width:0;background:none;border:0;text-align:left;font-size:.9rem;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 0}
 .h-del{background:none;border:0;color:var(--muted);font-size:1.3rem;padding:2px 10px}
 .empty{color:var(--muted);font-size:.9rem}
+.ava{width:28px;height:28px;border-radius:50%;background:#3a2a55 center/cover;color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:700;flex:none;margin-top:2px}
+.ava.big{width:84px;height:84px;font-size:2rem;margin:0}
+.who{display:flex;align-items:center;gap:10px;margin-bottom:14px}.who b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shr{display:none;gap:8px;margin-bottom:14px}.shr button{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px}
+#settings{position:fixed;inset:0;z-index:40;background:#000;display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+#settings.on{display:flex}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
+.sbody{flex:1;overflow-y:auto;padding:4px 16px calc(30px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.sbody label{display:flex;flex-direction:column;gap:6px;font-size:.9rem;color:var(--muted)}
+.sbody h4{margin:10px 0 0;font-size:.95rem}
+.sbody input:not(.sw),.sbody select,.sbody textarea{background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ink);font:inherit;padding:11px 12px;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 14px}
+.sbody .rowl{flex-direction:row;align-items:center;justify-content:space-between;padding:8px 0;color:var(--ink);font-size:1rem}
+.rowl select{width:auto;max-width:55%}
+.prof{display:flex;align-items:center;gap:16px;padding:14px}
+.chipb{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:.85rem}
+.memi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:.9rem}
+.addm{display:flex;gap:8px;padding:10px 0}
+.note{font-size:.78rem;color:var(--muted);margin:0}
+.danger{background:none;border:1px solid #6b2230;color:#ff8a9a;border-radius:14px;padding:12px}
+.sw{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:#333;position:relative;border:0;flex:none;margin:0}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.sw:checked{background:var(--p)}.sw:checked::after{left:21px}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;border:1px solid var(--line);border-radius:999px;padding:8px 16px;z-index:50;display:none;font-size:.9rem}#toast.on{display:block}
+#go .st{display:none}#go.busy .st{display:block}#go.busy .mi,#go.busy .ar{display:none}
 :focus-visible{outline:2px solid var(--p);outline-offset:2px}
 @keyframes bob{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
 @keyframes pulse{50%{transform:scale(1.08)}}
@@ -98,6 +123,10 @@ textarea::placeholder{color:var(--muted)}
   <button data-p="Tell me a surprising fun fact."><i>★</i>Fun fact</button>
   <button data-p="Help me summarize a text. Ask me to paste it."><i>≡</i>Summarize</button>
   <button data-p="Give me one practical tip to be more productive today."><i>✓</i>Tips</button>
+  <button data-p="Help me with a coding problem. Ask me the language and what I am building."><i>‹›</i>Code</button>
+  <button data-p="Check my grammar and improve my writing. Ask me to paste the text."><i>Aa</i>Grammar</button>
+  <button data-p="Give me practical career advice. Ask me about my situation first."><i>↗</i>Career</button>
+  <button data-p="Help me plan a trip. Ask me where, when and my budget."><i>⌂</i>Travel</button>
 </div>
 <form id="form">
   <button class="plus" type="button" data-act="newchat" aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -105,9 +134,10 @@ textarea::placeholder{color:var(--muted)}
   <button id="go" type="submit" aria-label="Send or speak">
     <svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
     <svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    <svg class="st" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>
   </button>
 </form>
-<div id="drawer"><div class="sheet"><h3>Chats</h3><button class="newc" data-act="newchat">+ New chat</button><div id="hlist"></div></div></div>
+<div id="drawer"><div class="sheet"><div class="who"><span class="ava"></span><b id="dname">Guest</b><button class="icon" data-act="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div><button class="newc" data-act="newchat">+ New chat</button><div class="shr" id="shr"><button data-act="share">Share chat</button><button data-act="dl">Download .txt</button></div><h3>Chats</h3><div id="hlist"></div></div></div>
 <div id="voice" role="dialog" aria-label="Voice mode">
   <div class="vtop"><button class="icon" id="vclose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button class="icon" id="vkb" aria-label="Type instead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8"/></svg></button></div>
   <canvas id="wave"></canvas>
@@ -119,11 +149,41 @@ textarea::placeholder{color:var(--muted)}
     <button class="icon" id="vx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
 </div>
+<div id="settings" role="dialog" aria-label="Settings">
+  <div class="shead"><button class="icon" id="sback" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><b>Settings</b><span style="width:44px"></span></div>
+  <div class="sbody">
+    <div class="card prof"><span class="ava big"></span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="chipb" data-act="avpick">Edit photo</button><button class="chipb" data-act="avrm">Remove</button></div><input type="file" id="avfile" accept="image/*" hidden></div>
+    <label>What should Rossie call you?<input id="sname" maxlength="40" placeholder="Your name" autocomplete="off"></label>
+    <h4>Personality</h4>
+    <div class="card">
+      <label class="rowl">Style and tone<select id="stone"><option value="default">Default</option><option value="professional">Professional</option><option value="friendly">Friendly</option><option value="candid">Candid</option><option value="quirky">Quirky</option><option value="efficient">Efficient</option><option value="cynical">Cynical</option></select></label>
+      <label class="rowl">Warmth<input type="checkbox" class="sw" id="swarm"></label><label class="rowl">Enthusiasm<input type="checkbox" class="sw" id="senth"></label><label class="rowl">Headers and lists<input type="checkbox" class="sw" id="slists"></label><label class="rowl">Emoji<input type="checkbox" class="sw" id="semoji"></label>
+    </div>
+    <label>Custom instructions<textarea id="scustom" rows="5" maxlength="600" placeholder="Example: Explain things step by step. Be honest if my idea is weak."></textarea></label>
+    <h4>Language</h4>
+    <label class="rowl card">Reply and voice language<select id="slang"></select></label>
+    <h4>Memory</h4>
+    <div class="card"><label class="rowl">Remember things about me<input type="checkbox" class="sw" id="smem"></label><div id="memlist"></div><div class="addm"><input id="memin" maxlength="200" placeholder="Add something to remember" autocomplete="off"><button class="chipb" data-act="memadd">Add</button></div></div>
+    <p class="note">Tip: say “remember that …” in chat. Settings stay on this phone, but your messages and memories are sent to the AI service to answer you.</p>
+    <button class="danger" data-act="wipe">Delete all my data</button>
+  </div>
+</div>
+<div id="toast" role="status"></div>
 <script>
 const PROXY_URL = "https://rossie-ai.shinermathew.workers.dev";
 const $ = id => document.getElementById(id);
 const log = $("log"), input = $("input"), go = $("go"), chips = $("chips");
-let history = [], chatId = null, speakAll = false;
+let history = [], chatId = null, speakAll = false, busy = false, ctrl = null;
+const DEF = {name:"", avatar:"", tone:"default", warmth:true, enth:true, lists:true, emoji:true, custom:"", lang:"auto", memOn:true, mem:[]};
+const LANGS = {auto:["Auto",""], en:["English","en-US"], hi:["Hindi","hi-IN"], ml:["Malayalam","ml-IN"], ta:["Tamil","ta-IN"], te:["Telugu","te-IN"], ar:["Arabic","ar-SA"], es:["Spanish","es-ES"], fr:["French","fr-FR"]};
+let S = Object.assign({}, DEF, (() => { try { return JSON.parse(localStorage.getItem("rossie-set") || "{}"); } catch (e) { return {}; } })());
+function saveS(){ try { localStorage.setItem("rossie-set", JSON.stringify(S)); } catch (e) { toast("Could not save (photo too large?)"); } }
+function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("on"), 1800); }
+function vlang(){ return (LANGS[S.lang] && LANGS[S.lang][1]) || vlang(); }
+function prof(){ return {name:S.name, tone:S.tone, warmth:S.warmth, enth:S.enth, lists:S.lists, emoji:S.emoji, custom:S.custom, lang:S.lang === "auto" ? "" : LANGS[S.lang][0], mem:S.memOn ? S.mem : []}; }
+function greet(){ const n = (S.name || "").trim().split(/\s+/)[0]; return n ? "Hi " + n + ", I’m Rossie!" : "Hi, I’m Rossie!"; }
+function ini(el){ el.style.backgroundImage = S.avatar ? "url(" + S.avatar + ")" : ""; el.textContent = S.avatar ? "" : ((S.name || "?").trim()[0] || "?").toUpperCase(); }
+function paintAll(){ document.querySelectorAll(".ava").forEach(ini); $("dname").textContent = S.name || "Guest"; }
 
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function md(src){
@@ -148,24 +208,26 @@ function md(src){
 /* saved chats */
 function load(){ try { return JSON.parse(localStorage.getItem("rossie-chats") || "[]"); } catch (e) { return []; } }
 function store(a){ try { localStorage.setItem("rossie-chats", JSON.stringify(a.slice(0, 20))); } catch (e) {} }
+function store(a){ try { localStorage.setItem("rossie-chats", JSON.stringify([...a.filter(c => c.pin), ...a.filter(c => !c.pin)].slice(0, 30))); } catch (e) {} }
 function saveChat(){
   if (!history.length) return;
   const a = load(); if (!chatId) chatId = Date.now().toString(36);
-  const rec = {id:chatId, title:history[0].content.slice(0, 48), msgs:history};
-  const i = a.findIndex(c => c.id === chatId);
+  const i = a.findIndex(c => c.id === chatId), old = i >= 0 ? a[i] : null;
+  const rec = {id:chatId, title:old ? old.title : history[0].content.slice(0, 48), pin:old ? !!old.pin : false, msgs:history};
   if (i >= 0) a[i] = rec; else a.unshift(rec);
   store(a);
 }
 function renderList(){
   const a = load();
-  $("hlist").innerHTML = a.length ? a.map(c => '<div class="h-item"><button class="h-title" data-act="open" data-id="' + c.id + '">' + esc(c.title) + '</button><button class="h-del" data-act="del" data-id="' + c.id + '" aria-label="Delete chat">⋮</button></div>').join("") : '<p class="empty">No saved chats yet.</p>';
+  $("hlist").innerHTML = a.length ? a.map(c => '<div class="h-item"><button class="h-del" data-act="pin" data-id="' + c.id + '" aria-label="Pin" style="' + (c.pin ? "color:#ffcf5a" : "") + '">' + (c.pin ? "★" : "☆") + '</button><button class="h-title" data-act="open" data-id="' + c.id + '">' + esc(c.title) + '</button><button class="h-del" data-act="ren" data-id="' + c.id + '" aria-label="Rename">✎</button><button class="h-del" data-act="del" data-id="' + c.id + '" aria-label="Delete">✕</button></div>').join("") : '<p class="empty">No saved chats yet.</p>';
 }
-function menu(on){ if (on) renderList(); $("drawer").classList.toggle("on", on); }
+function menu(on){ if (on) { renderList(); paintAll(); $("shr").style.display = history.length ? "flex" : "none"; } $("drawer").classList.toggle("on", on); }
+function chatText(){ return history.map(m => (m.role === "user" ? (S.name || "You") : "Rossie") + ": " + m.content).join("\n\n") + "\n\n— Rossie AI by Shine R Mathew"; }
 
 /* screens */
 function home(){
   history = []; chatId = null;
-  log.innerHTML = '<section id="hero"><canvas id="orb"></canvas><p class="hi">Hi, I’m Rossie!</p><h2>How can I help you today?</h2><p class="by">Made by <a href="https://www.instagram.com/iam.sh1ne/" target="_blank" rel="noopener">Shine R Mathew</a> · @iam.sh1ne</p></section>';
+  log.innerHTML = '<section id="hero"><canvas id="orb"></canvas><p class="hi">' + esc(greet()) + '</p><h2>How can I help you today?</h2><p class="by">Made by <a href="https://www.instagram.com/iam.sh1ne/" target="_blank" rel="noopener">Shine R Mathew</a> · @iam.sh1ne</p></section>';
   chips.style.display = "";
 }
 function scrollDown(){ log.scrollTop = log.scrollHeight; }
@@ -174,7 +236,9 @@ function addMe(text){
   start();
   const r = document.createElement("div"); r.className = "row me";
   const b = document.createElement("div"); b.className = "bubble"; b.textContent = text;
-  r.appendChild(b); log.appendChild(r); scrollDown();
+  r.appendChild(b);
+  if (S.name || S.avatar) { const a = document.createElement("span"); a.className = "ava"; ini(a); r.appendChild(a); }
+  log.appendChild(r); scrollDown();
 }
 function addAI(){
   const r = document.createElement("div"); r.className = "row ai";
@@ -196,23 +260,43 @@ function openChat(id){
   scrollDown();
 }
 
+function setBusy(b){ busy = b; go.classList.toggle("busy", b); }
+function stopGen(){ if (ctrl) ctrl.abort(); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
+function maybeRemember(t){
+  if (!S.memOn) return;
+  const m = t.match(/^\s*(?:please\s+)?remember(?:\s+that)?[:,]?\s+(.{3,200})$/i);
+  if (m) { const v = m[1].trim(); if (!S.mem.includes(v)) { S.mem.push(v); S.mem = S.mem.slice(-20); saveS(); toast("Saved to memory"); } }
+}
 async function ask(text, spoken){
+  if (busy) return;
+  maybeRemember(text);
   addMe(text); history.push({role:"user", content:text});
-  go.disabled = true;
-  const row = addAI();
+  setBusy(true); ctrl = new AbortController();
+  const row = addAI(), body = row.querySelector(".body"); let out = "", pend = false, fin = false;
+  const paint = () => { pend = false; if (fin) return; body.innerHTML = md(out); scrollDown(); };
   try {
-    const res = await fetch(PROXY_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({messages:history.slice(-20)})});
-    const data = await res.json();
-    if (!res.ok) throw new Error((data.error && data.error.message) || "Request failed (" + res.status + ")");
-    const reply = data.choices[0].message.content;
-    fill(row, reply); history.push({role:"assistant", content:reply}); saveChat();
-    if (spoken || speakAll) speak(reply);
+    const res = await fetch(PROXY_URL, {method:"POST", headers:{"Content-Type":"application/json"}, signal:ctrl.signal, body:JSON.stringify({messages:history.slice(-20), stream:true, profile:prof()})});
+    if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error((d.error && d.error.message) || "Request failed (" + res.status + ")"); }
+    const rd = res.body.getReader(), dec = new TextDecoder(); let buf = "";
+    for (;;) {
+      const {done, value} = await rd.read(); if (done) break;
+      buf += dec.decode(value, {stream:true}); const lines = buf.split("\n"); buf = lines.pop();
+      for (const ln of lines) {
+        if (!ln.startsWith("data:")) continue; const d = ln.slice(5).trim(); if (!d || d === "[DONE]") continue;
+        try { const t = JSON.parse(d).choices[0].delta.content; if (t) { out += t; if (!pend) { pend = true; requestAnimationFrame(paint); } } } catch (e) {}
+      }
+    }
+    if (!out.trim()) throw new Error("Empty reply");
   } catch (err) {
-    row.remove(); history.pop();
-    addErr("Sorry, something went wrong: " + err.message + ". Please try again.");
-    if (spoken) $("vtext").textContent = "Something went wrong. Tap the mic to try again.";
+    if (!out.trim()) {
+      fin = true; row.remove(); history.pop(); setBusy(false);
+      if (err.name !== "AbortError") { addErr("Sorry, something went wrong: " + err.message + ". Please try again."); if (spoken) $("vtext").textContent = "Something went wrong. Tap the mic to try again."; }
+      return;
+    }
   }
-  go.disabled = false; scrollDown();
+  fin = true; fill(row, out); history.push({role:"assistant", content:out}); saveChat();
+  if ((spoken || speakAll) && !ctrl.signal.aborted) speak(out);
+  setBusy(false); scrollDown();
 }
 
 /* voice mode */
@@ -221,7 +305,7 @@ let rec = null, listening = false, vt0 = 0, vint = null;
 function speak(t){
   const clean = t.replace(/[*`#_]/g, "");
   $("vtext").textContent = clean;
-  if ("speechSynthesis" in window) { const u = new SpeechSynthesisUtterance(clean); u.lang = navigator.language || "en-US"; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+  if ("speechSynthesis" in window) { const u = new SpeechSynthesisUtterance(clean); u.lang = vlang(); speechSynthesis.cancel(); speechSynthesis.speak(u); }
 }
 function tick(){ const s = Math.floor((Date.now() - vt0) / 1000); $("vtimer").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
 function openVoice(){
@@ -234,7 +318,7 @@ function toggleListen(){
   if (!SR) return;
   if (listening) { rec.stop(); return; }
   if ("speechSynthesis" in window) speechSynthesis.cancel();
-  rec = new SR(); rec.lang = navigator.language || "en-US"; rec.interimResults = true; rec.continuous = false;
+  rec = new SR(); rec.lang = vlang(); rec.interimResults = true; rec.continuous = false;
   let finalText = "";
   rec.onstart = () => { listening = true; $("voice").classList.add("live"); $("vtext").textContent = "Listening…"; };
   rec.onresult = e => { let t = ""; for (const r of e.results) t += r[0].transcript; finalText = t; $("vtext").textContent = t; };
@@ -305,7 +389,17 @@ document.addEventListener("click", e => {
   if (a === "menu") menu(true);
   else if (a === "newchat") { menu(false); home(); }
   else if (a === "open") { menu(false); openChat(id); }
-  else if (a === "del" && confirm("Delete this chat?")) { store(load().filter(c => c.id !== id)); renderList(); }
+  else if (a === "del") { if (confirm("Delete this chat?")) { store(load().filter(c => c.id !== id)); renderList(); } }
+  else if (a === "pin") { const l = load(), c = l.find(x => x.id === id); if (c) { c.pin = !c.pin; store(l); renderList(); } }
+  else if (a === "ren") { const l = load(), c = l.find(x => x.id === id); const t = c && prompt("Rename chat", c.title); if (t && t.trim()) { c.title = t.trim().slice(0, 60); store(l); renderList(); } }
+  else if (a === "settings") openSet();
+  else if (a === "share") { if (navigator.share) navigator.share({title:"Rossie AI chat", text:chatText()}).catch(() => {}); else navigator.clipboard.writeText(chatText()).then(() => toast("Chat copied")).catch(() => {}); }
+  else if (a === "dl") { const b = new Blob([chatText()], {type:"text/plain"}), l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = "rossie-chat.txt"; l.click(); }
+  else if (a === "avpick") $("avfile").click();
+  else if (a === "avrm") { S.avatar = ""; saveS(); paintAll(); }
+  else if (a === "memadd") { const v = $("memin").value.trim(); if (v) { S.mem.push(v.slice(0, 200)); S.mem = S.mem.slice(-20); saveS(); $("memin").value = ""; memList(); } }
+  else if (a === "rmmem") { S.mem.splice(+id, 1); saveS(); memList(); }
+  else if (a === "wipe") { if (confirm("Delete all chats, memories and settings on this phone?")) { try { localStorage.removeItem("rossie-chats"); localStorage.removeItem("rossie-set"); } catch (e) {} location.reload(); } }
 });
 input.addEventListener("input", () => {
   input.style.height = "auto"; input.style.height = input.scrollHeight + "px";
@@ -314,11 +408,32 @@ input.addEventListener("input", () => {
 input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && matchMedia("(hover:hover)").matches) { e.preventDefault(); $("form").requestSubmit(); } });
 $("form").addEventListener("submit", e => {
   e.preventDefault();
+  if (busy) { stopGen(); return; }
   const t = input.value.trim();
   if (!t) { openVoice(); return; }
   if (go.disabled) return;
   input.value = ""; input.style.height = "auto"; go.classList.remove("has"); ask(t);
 });
+function memList(){ $("memlist").innerHTML = S.mem.map((m, i) => '<div class="memi"><span>' + esc(m) + '</span><button class="h-del" data-act="rmmem" data-id="' + i + '" aria-label="Forget">✕</button></div>').join(""); }
+function openSet(){
+  menu(false); $("settings").classList.add("on");
+  $("sname").value = S.name; $("stone").value = S.tone; $("scustom").value = S.custom; $("slang").value = S.lang;
+  [["swarm","warmth"],["senth","enth"],["slists","lists"],["semoji","emoji"],["smem","memOn"]].forEach(([id, k]) => $(id).checked = !!S[k]);
+  memList(); paintAll();
+}
+$("slang").innerHTML = Object.entries(LANGS).map(([k, v]) => '<option value="' + k + '">' + v[0] + '</option>').join("");
+$("sback").onclick = () => { $("settings").classList.remove("on"); home(); };
+$("sname").oninput = e => { S.name = e.target.value.slice(0, 40); saveS(); paintAll(); };
+$("stone").onchange = e => { S.tone = e.target.value; saveS(); };
+[["swarm","warmth"],["senth","enth"],["slists","lists"],["semoji","emoji"],["smem","memOn"]].forEach(([id, k]) => $(id).onchange = e => { S[k] = e.target.checked; saveS(); });
+$("scustom").oninput = e => { S.custom = e.target.value; saveS(); };
+$("slang").onchange = e => { S.lang = e.target.value; saveS(); };
+$("avfile").onchange = e => {
+  const f = e.target.files[0]; if (!f) return; const img = new Image();
+  img.onload = () => { const c = document.createElement("canvas"), m = Math.min(img.width, img.height); c.width = c.height = 160; c.getContext("2d").drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, 160, 160); S.avatar = c.toDataURL("image/jpeg", 0.8); saveS(); paintAll(); URL.revokeObjectURL(img.src); };
+  img.src = URL.createObjectURL(f);
+};
+paintAll();
 home();
 requestAnimationFrame(frame);
 </script>
