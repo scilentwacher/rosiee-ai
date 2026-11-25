@@ -3,89 +3,322 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <title>Rossie AI</title>
 <style>
-:root{color-scheme:dark;--bg:#232323;--surface:#2D2D2D;--ink:#f3eefc;--muted:#a9a3b8;--accent:#C5A3FF;--on-accent:#2D2D2D;--user:#C5A3FF;--line:#404040}
+:root{color-scheme:dark;--bg:#000;--card:#141414;--card2:#1d1d1d;--line:rgba(255,255,255,.09);--ink:#f6f6f6;--muted:#a1a1a8;--p:#b24bff;--g:linear-gradient(160deg,#a73cff,#ff3d77)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
-h1{font-size:1.1rem;margin:0}
-button{font:inherit;cursor:pointer}
-.ghost{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 12px}
-#log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.msg{max-width:88%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word}
-.me{align-self:flex-end;background:var(--user);color:#2D2D2D;border-bottom-right-radius:4px}
-.ai{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;height:100dvh;padding-top:env(safe-area-inset-top,0px)}
+button{font:inherit;color:inherit;cursor:pointer}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
+.icon{width:44px;height:44px;border-radius:50%;background:var(--card2);border:1px solid var(--line);display:grid;place-items:center;flex:none}
+.icon svg{width:20px;height:20px}
+.pill{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:6px 20px 6px 8px}
+.pill b{display:block;font-size:.95rem;line-height:1.15}
+.pill small{color:var(--muted);font-size:.7rem}
+.star{width:32px;height:32px;border-radius:50%;background:#0c0c0c;display:grid;place-items:center}
+.star svg{width:18px;height:18px}
+#snd .off{display:none}#snd.muted .on{display:none}#snd.muted .off{display:block}
+#log{flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:18px}
+#hero{margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center}
+#orb{width:min(58vw,230px);aspect-ratio:1;filter:drop-shadow(0 0 22px rgba(200,80,255,.45));margin-bottom:14px}
+.hi{margin:0;color:var(--muted);font-size:.95rem}
+h2{margin:6px 0 0;font-size:2.05rem;line-height:1.15;font-weight:600;max-width:12ch}
+.row{display:flex;gap:10px;align-items:flex-start;max-width:100%}
+.row.me{justify-content:flex-end}
+.bubble{background:linear-gradient(135deg,#8a3dff,#c04dff);color:#fff;border-radius:20px 20px 6px 20px;padding:10px 15px;max-width:85%;white-space:pre-wrap;word-wrap:break-word}
+.av{width:26px;height:26px;border-radius:50%;background:conic-gradient(#ff9a3d,#e84dff,#6a5cff,#ff9a3d);position:relative;flex:none;margin-top:2px}
+.av::after{content:"";position:absolute;inset:3px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a2a63,#000 70%)}
+.body{min-width:0;flex:1;overflow-wrap:anywhere}
+.body p{margin:0 0 .6em}.body p:last-child{margin:0}
+.body ul,.body ol{margin:.2em 0 .7em;padding-left:1.3em}
+.body code{background:#1c1c1c;border-radius:6px;padding:1px 6px;font-size:.9em}
+.body pre{background:#0d0d0d;border:1px solid var(--line);border-radius:12px;padding:12px;overflow-x:auto;margin:.5em 0}
+.body pre code{background:none;padding:0}
+.copy{background:none;border:0;color:var(--muted);font-size:.8rem;padding:4px 0;margin-top:4px}
 .err{align-self:center;color:#ff9b93;font-size:.9rem;text-align:center}
-.empty{margin:auto;text-align:center;color:var(--muted);max-width:28ch}
-form{display:flex;gap:8px;padding:10px 12px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--surface)}
-textarea{flex:1;resize:none;max-height:120px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-#send{background:var(--accent);color:var(--on-accent);border:0;border-radius:12px;padding:0 18px;font-weight:600}
-#send:disabled{opacity:.5}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);width:min(92vw,420px);padding:18px}
-dialog::backdrop{background:rgba(0,0,0,.5)}
-label{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 4px}
-input,select,dialog textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.row{display:flex;gap:8px;margin-top:16px}
-.row button{flex:1;padding:10px;border-radius:10px}
-.primary{background:var(--accent);color:var(--on-accent);border:0;font-weight:600}
-small{color:var(--muted)}
+.dots span{display:inline-block;width:7px;height:7px;margin-right:4px;border-radius:50%;background:var(--muted);animation:bob 1.1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+.chips{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);gap:8px;overflow-x:auto;padding:4px 14px 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{display:flex;align-items:center;gap:8px;white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 14px 8px 8px}
+.chips i{font-style:normal;width:26px;height:26px;border-radius:8px;background:var(--card2);display:grid;place-items:center;font-size:.85rem;color:#d9b3ff}
+.chips button:active{border-color:var(--p)}
+form{display:flex;align-items:flex-end;gap:6px;margin:0 12px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);border:1px solid var(--line);border-radius:30px;padding:6px}
+form:focus-within{border-color:var(--p)}
+form .plus{width:40px;height:40px;border-radius:50%;border:0;background:none;color:var(--muted);display:grid;place-items:center}
+form .plus svg{width:22px;height:22px}
+textarea{flex:1;resize:none;max-height:130px;font:inherit;color:var(--ink);background:none;border:0;outline:0;padding:9px 0}
+textarea::placeholder{color:var(--muted)}
+#go{width:44px;height:44px;border-radius:50%;border:0;background:var(--g);color:#fff;display:grid;place-items:center;flex:none}
+#go:disabled{opacity:.5}
+#go svg{width:21px;height:21px}
+#go .ar{display:none}#go.has .ar{display:block}#go.has .mi{display:none}
+#voice{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;background:radial-gradient(ellipse 130% 46% at 50% 108%,rgba(255,40,90,.9),rgba(140,20,90,.4) 45%,transparent 72%),#000;padding:calc(12px + env(safe-area-inset-top,0px)) 14px calc(26px + env(safe-area-inset-bottom,0px))}
+#voice.on{display:flex}
+.vtop{width:100%;display:flex;justify-content:space-between}
+#wave{width:100%;height:150px;margin-top:34px}
+#vtimer{margin:14px 0 0;font-size:1.5rem;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+#vtext{margin:14px 0 0;flex:1;min-height:0;overflow-y:auto;text-align:center;font-size:1.1rem;line-height:1.5;max-width:30ch;color:#e7e7ea}
+.vctl{display:flex;align-items:center;gap:34px}
+#vmic{width:84px;height:84px;border-radius:50%;border:0;background:var(--g);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 12px rgba(255,255,255,.1),0 0 0 26px rgba(255,255,255,.05)}
+#vmic svg{width:34px;height:34px}
+#voice.live #vmic{animation:pulse 1.2s ease-in-out infinite}
+#drawer{position:fixed;inset:0;z-index:25;display:none;background:rgba(0,0,0,.6)}
+#drawer.on{display:block}
+.sheet{width:min(84vw,330px);height:100%;background:#0b0b0b;border-right:1px solid var(--line);padding:calc(16px + env(safe-area-inset-top,0px)) 14px 20px;overflow-y:auto}
+.sheet h3{margin:0 0 12px;font-size:1.1rem}
+.newc{width:100%;background:var(--g);border:0;border-radius:14px;padding:11px;font-weight:600;color:#fff;margin-bottom:14px}
+.h-item{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 4px 4px 12px;margin-bottom:8px}
+.h-title{flex:1;min-width:0;background:none;border:0;text-align:left;font-size:.9rem;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 0}
+.h-del{background:none;border:0;color:var(--muted);font-size:1.3rem;padding:2px 10px}
+.empty{color:var(--muted);font-size:.9rem}
+:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+@keyframes bob{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+@keyframes pulse{50%{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 <header>
-  <h1>Rossie AI</h1>
-  <div><button class="ghost" id="clear">New chat</button></div>
+  <button class="icon" data-act="menu" aria-label="Chats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+  <div class="pill"><span class="star"><svg viewBox="0 0 24 24"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a3d"/><stop offset="1" stop-color="#b24bff"/></linearGradient></defs><path fill="url(#sg)" d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg></span><div><b>Rossie</b><small>AI Assistant</small></div></div>
+  <button class="icon" id="snd" aria-label="Read replies aloud"><svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6l-5 4zM17 9a4 4 0 0 1 0 6"/></svg><svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6l-5 4zM17 9l5 6M22 9l-5 6"/></svg></button>
 </header>
 <main id="log" aria-live="polite"></main>
+<div class="chips" id="chips">
+  <button data-p="Explain something to me in simple words. Ask me which topic."><i>✦</i>Explain</button>
+  <button data-p="Help me with my homework. Ask me the subject and the question."><i>✎</i>Homework</button>
+  <button data-p="Help me write a message. Ask me who it is for and what I want to say."><i>✉</i>Write</button>
+  <button data-p="Help me translate something. Ask me the languages."><i>⇄</i>Translate</button>
+  <button data-p="Give me one smart business idea I can start with little money."><i>◎</i>Ideas</button>
+  <button data-p="Tell me a surprising fun fact."><i>★</i>Fun fact</button>
+  <button data-p="Help me summarize a text. Ask me to paste it."><i>≡</i>Summarize</button>
+  <button data-p="Give me one practical tip to be more productive today."><i>✓</i>Tips</button>
+</div>
 <form id="form">
-  <textarea id="input" rows="1" placeholder="Message" aria-label="Message"></textarea>
-  <button id="send" type="submit">Send</button>
+  <button class="plus" type="button" data-act="newchat" aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <textarea id="input" rows="1" placeholder="Message…" aria-label="Message"></textarea>
+  <button id="go" type="submit" aria-label="Send or speak">
+    <svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+    <svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
 </form>
-
-
+<div id="drawer"><div class="sheet"><h3>Chats</h3><button class="newc" data-act="newchat">+ New chat</button><div id="hlist"></div></div></div>
+<div id="voice" role="dialog" aria-label="Voice mode">
+  <div class="vtop"><button class="icon" id="vclose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button class="icon" id="vkb" aria-label="Type instead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M7 10h.01M11 10h.01M15 10h.01M8 14h8"/></svg></button></div>
+  <canvas id="wave"></canvas>
+  <p id="vtimer">00:00</p>
+  <p id="vtext"></p>
+  <div class="vctl">
+    <button class="icon" id="vpause" aria-label="Stop"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+    <button id="vmic" aria-label="Tap to speak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <button class="icon" id="vx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+</div>
 <script>
 const PROXY_URL = "https://rossie-ai.shinermathew.workers.dev";
 const $ = id => document.getElementById(id);
-const log = $("log"), input = $("input"), send = $("send");
-let history = [];
+const log = $("log"), input = $("input"), go = $("go"), chips = $("chips");
+let history = [], chatId = null, speakAll = false;
 
-function add(cls, text){
-  const d = document.createElement("div");
-  d.className = "msg " + cls; d.textContent = text;
-  const empty = log.querySelector(".empty"); if (empty) empty.remove();
-  log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function md(src){
+  const blocks = [];
+  src = esc(src).replace(/```(?:\w+)?\n?([\s\S]*?)```/g, (m, c) => { blocks.push(c.replace(/\n$/, "")); return "\u0000" + (blocks.length - 1) + "\u0000"; });
+  const inline = t => t.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+  let out = "", list = null;
+  const close = () => { if (list) { out += "</" + list + ">"; list = null; } };
+  for (const raw of src.split("\n")) {
+    let m;
+    if (/^\u0000\d+\u0000$/.test(raw.trim())) { close(); out += raw.trim(); }
+    else if ((m = raw.match(/^\s*[-*•]\s+(.*)/))) { if (list !== "ul") { close(); out += "<ul>"; list = "ul"; } out += "<li>" + inline(m[1]) + "</li>"; }
+    else if ((m = raw.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== "ol") { close(); out += "<ol>"; list = "ol"; } out += "<li>" + inline(m[1]) + "</li>"; }
+    else if ((m = raw.match(/^#{1,4}\s+(.*)/))) { close(); out += "<p><strong>" + inline(m[1]) + "</strong></p>"; }
+    else if (!raw.trim()) close();
+    else { close(); out += "<p>" + inline(raw) + "</p>"; }
+  }
+  close();
+  return out.replace(/\u0000(\d+)\u0000/g, (m, i) => "<pre><code>" + blocks[i] + "</code></pre>");
 }
-function showEmpty(){ log.innerHTML = '<div class="empty">Hi, I’m Rossie AI. Ask me anything.</div>'; }
-$("clear").onclick = () => { history = []; showEmpty(); };
-input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = input.scrollHeight + "px"; });
 
-$("form").addEventListener("submit", async e => {
-  e.preventDefault();
-  const text = input.value.trim(); if (!text) return;
-  input.value = ""; input.style.height = "auto";
-  add("me", text); history.push({role:"user", content:text});
-  send.disabled = true;
-  const wait = add("ai", "…");
+/* saved chats */
+function load(){ try { return JSON.parse(localStorage.getItem("rossie-chats") || "[]"); } catch (e) { return []; } }
+function store(a){ try { localStorage.setItem("rossie-chats", JSON.stringify(a.slice(0, 20))); } catch (e) {} }
+function saveChat(){
+  if (!history.length) return;
+  const a = load(); if (!chatId) chatId = Date.now().toString(36);
+  const rec = {id:chatId, title:history[0].content.slice(0, 48), msgs:history};
+  const i = a.findIndex(c => c.id === chatId);
+  if (i >= 0) a[i] = rec; else a.unshift(rec);
+  store(a);
+}
+function renderList(){
+  const a = load();
+  $("hlist").innerHTML = a.length ? a.map(c => '<div class="h-item"><button class="h-title" data-act="open" data-id="' + c.id + '">' + esc(c.title) + '</button><button class="h-del" data-act="del" data-id="' + c.id + '" aria-label="Delete chat">⋮</button></div>').join("") : '<p class="empty">No saved chats yet.</p>';
+}
+function menu(on){ if (on) renderList(); $("drawer").classList.toggle("on", on); }
+
+/* screens */
+function home(){
+  history = []; chatId = null;
+  log.innerHTML = '<section id="hero"><canvas id="orb"></canvas><p class="hi">Hi, I’m Rossie!</p><h2>How can I help you today?</h2></section>';
+  chips.style.display = "";
+}
+function scrollDown(){ log.scrollTop = log.scrollHeight; }
+function start(){ const h = $("hero"); if (h) h.remove(); chips.style.display = "none"; }
+function addMe(text){
+  start();
+  const r = document.createElement("div"); r.className = "row me";
+  const b = document.createElement("div"); b.className = "bubble"; b.textContent = text;
+  r.appendChild(b); log.appendChild(r); scrollDown();
+}
+function addAI(){
+  const r = document.createElement("div"); r.className = "row ai";
+  r.innerHTML = '<span class="av"></span><div class="body"><span class="dots"><span></span><span></span><span></span></span></div>';
+  log.appendChild(r); scrollDown(); return r;
+}
+function fill(row, text){
+  const body = row.querySelector(".body");
+  body.innerHTML = md(text);
+  const c = document.createElement("button"); c.className = "copy"; c.textContent = "Copy";
+  c.onclick = async () => { try { await navigator.clipboard.writeText(text); c.textContent = "Copied"; setTimeout(() => c.textContent = "Copy", 1500); } catch (e) {} };
+  body.appendChild(c);
+}
+function addErr(t){ const d = document.createElement("div"); d.className = "err"; d.textContent = t; log.appendChild(d); scrollDown(); }
+function openChat(id){
+  const c = load().find(x => x.id === id); if (!c) return;
+  history = c.msgs.slice(); chatId = id; log.innerHTML = ""; start();
+  for (const m of history) { if (m.role === "user") addMe(m.content); else { const r = addAI(); fill(r, m.content); } }
+  scrollDown();
+}
+
+async function ask(text, spoken){
+  addMe(text); history.push({role:"user", content:text});
+  go.disabled = true;
+  const row = addAI();
   try {
-    const res = await fetch(PROXY_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({messages: history.slice(-20)})
-    });
+    const res = await fetch(PROXY_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({messages:history.slice(-20)})});
     const data = await res.json();
     if (!res.ok) throw new Error((data.error && data.error.message) || "Request failed (" + res.status + ")");
     const reply = data.choices[0].message.content;
-    wait.textContent = reply; history.push({role:"assistant", content:reply});
+    fill(row, reply); history.push({role:"assistant", content:reply}); saveChat();
+    if (spoken || speakAll) speak(reply);
   } catch (err) {
-    wait.remove(); history.pop();
-    add("err", "Sorry, something went wrong: " + err.message + ". Please try again.");
+    row.remove(); history.pop();
+    addErr("Sorry, something went wrong: " + err.message + ". Please try again.");
+    if (spoken) $("vtext").textContent = "Something went wrong. Tap the mic to try again.";
   }
-  send.disabled = false; log.scrollTop = log.scrollHeight;
+  go.disabled = false; scrollDown();
+}
+
+/* voice mode */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, listening = false, vt0 = 0, vint = null;
+function speak(t){
+  const clean = t.replace(/[*`#_]/g, "");
+  $("vtext").textContent = clean;
+  if ("speechSynthesis" in window) { const u = new SpeechSynthesisUtterance(clean); u.lang = navigator.language || "en-US"; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+}
+function tick(){ const s = Math.floor((Date.now() - vt0) / 1000); $("vtimer").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+function openVoice(){
+  $("voice").classList.add("on"); vt0 = Date.now(); tick(); clearInterval(vint); vint = setInterval(tick, 1000);
+  $("vtext").textContent = SR ? "Tap the mic and speak" : "Voice needs Chrome or Safari on your phone.";
+}
+function stopAll(){ if (rec && listening) rec.stop(); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
+function closeVoice(){ stopAll(); clearInterval(vint); $("voice").classList.remove("on", "live"); }
+function toggleListen(){
+  if (!SR) return;
+  if (listening) { rec.stop(); return; }
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  rec = new SR(); rec.lang = navigator.language || "en-US"; rec.interimResults = true; rec.continuous = false;
+  let finalText = "";
+  rec.onstart = () => { listening = true; $("voice").classList.add("live"); $("vtext").textContent = "Listening…"; };
+  rec.onresult = e => { let t = ""; for (const r of e.results) t += r[0].transcript; finalText = t; $("vtext").textContent = t; };
+  rec.onerror = e => { $("vtext").textContent = e.error === "not-allowed" ? "Allow microphone access, then tap the mic again." : "Didn’t catch that. Tap the mic again."; };
+  rec.onend = () => { listening = false; $("voice").classList.remove("live"); if (finalText.trim()) { $("vtext").textContent = "Thinking…"; ask(finalText.trim(), true); } };
+  try { rec.start(); } catch (e) {}
+}
+
+/* animated art: wireframe orb + waveform */
+const dpr = Math.min(window.devicePixelRatio || 1, 2);
+const reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
+function fit(c){ const w = Math.round(c.clientWidth * dpr), h = Math.round(c.clientHeight * dpr); if (c.width !== w || c.height !== h) { c.width = w; c.height = h; } return w > 0; }
+const STOPS = [[255,150,60],[232,77,255],[106,92,255]];
+function col(k, a){ k = Math.max(0, Math.min(1, k)) * 2; const i = Math.min(1, Math.floor(k)), f = k - i, A = STOPS[i], B = STOPS[i + 1]; return "rgba(" + Math.round(A[0] + (B[0] - A[0]) * f) + "," + Math.round(A[1] + (B[1] - A[1]) * f) + "," + Math.round(A[2] + (B[2] - A[2]) * f) + "," + a + ")"; }
+function drawOrb(c, t){
+  const ctx = c.getContext("2d"), W = c.width, R = W * 0.36, cx = W / 2, cy = c.height / 2, tilt = 0.45, ct = Math.cos(tilt), st = Math.sin(tilt);
+  ctx.clearRect(0, 0, W, c.height); ctx.lineWidth = Math.max(1, dpr * 0.9); ctx.lineCap = "round";
+  const P = (lat, lon) => {
+    const r = R * (1 + 0.09 * Math.sin(3 * lon + 2 * lat + t * 1.2) + 0.05 * Math.sin(5 * lat - t));
+    const x = r * Math.cos(lat) * Math.cos(lon), y = r * Math.sin(lat), z = r * Math.cos(lat) * Math.sin(lon);
+    const y2 = y * ct - z * st, z2 = y * st + z * ct, s = 1 + z2 / (R * 4);
+    return [cx + x * s, cy + y2 * s, z2];
+  };
+  const seg = (a, b) => { const k = ((a[1] + b[1]) / 2 - (cy - R)) / (2 * R), d = (a[2] + b[2]) / 2; ctx.strokeStyle = col(k, 0.25 + 0.75 * (d + R) / (2 * R)); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); };
+  for (let m = 0; m < 16; m++) { const lon = m * Math.PI / 8 + t * 0.4; let p = P(-Math.PI / 2, lon); for (let j = 1; j <= 24; j++) { const q = P(-Math.PI / 2 + j * Math.PI / 24, lon); seg(p, q); p = q; } }
+  for (let k = -6; k <= 6; k++) { const lat = k * Math.PI / 14; let p = P(lat, t * 0.4); for (let j = 1; j <= 40; j++) { const q = P(lat, t * 0.4 + j * Math.PI / 20); seg(p, q); p = q; } }
+}
+let energy = 0.2;
+function drawWave(c, t){
+  const ctx = c.getContext("2d"), W = c.width, H = c.height;
+  const target = listening ? 1 : (("speechSynthesis" in window && speechSynthesis.speaking) ? 0.8 : 0.2);
+  energy += (target - energy) * 0.08;
+  ctx.clearRect(0, 0, W, H);
+  const g = ctx.createLinearGradient(0, 0, W, 0); g.addColorStop(0, "#5ad1ff"); g.addColorStop(0.5, "#b24bff"); g.addColorStop(1, "#ff4da6");
+  ctx.strokeStyle = g; ctx.lineWidth = 1.2 * dpr;
+  for (let k = 0; k < 9; k++) {
+    ctx.globalAlpha = 0.25 + 0.075 * k; ctx.beginPath();
+    for (let x = 0; x <= W; x += 4) {
+      const u = x / W, env = Math.pow(Math.sin(Math.PI * u), 1.5);
+      const y = H / 2 + env * H * 0.42 * energy * (Math.sin(u * 6 + t * 1.6 + k * 0.45) * 0.6 + Math.sin(u * 11 - t * 2.1 + k * 0.8) * 0.4);
+      if (x) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+function frame(ms){
+  const t = reduce ? 0 : ms / 1000;
+  if (!document.hidden) {
+    const o = $("orb"); if (o && fit(o)) drawOrb(o, t);
+    if ($("voice").classList.contains("on")) { const w = $("wave"); if (fit(w)) drawWave(w, t); }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* wiring */
+$("vmic").onclick = toggleListen;
+$("vclose").onclick = $("vx").onclick = closeVoice;
+$("vpause").onclick = stopAll;
+$("vkb").onclick = () => { closeVoice(); input.focus(); };
+$("snd").onclick = () => { speakAll = !speakAll; $("snd").classList.toggle("muted", !speakAll); if (!speakAll && "speechSynthesis" in window) speechSynthesis.cancel(); };
+$("snd").classList.add("muted");
+$("drawer").addEventListener("click", e => { if (e.target.id === "drawer") menu(false); });
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-p],[data-act]"); if (!el) return;
+  if (el.dataset.p) { ask(el.dataset.p); return; }
+  const a = el.dataset.act, id = el.dataset.id;
+  if (a === "menu") menu(true);
+  else if (a === "newchat") { menu(false); home(); }
+  else if (a === "open") { menu(false); openChat(id); }
+  else if (a === "del" && confirm("Delete this chat?")) { store(load().filter(c => c.id !== id)); renderList(); }
 });
-showEmpty();
+input.addEventListener("input", () => {
+  input.style.height = "auto"; input.style.height = input.scrollHeight + "px";
+  go.classList.toggle("has", !!input.value.trim());
+});
+input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && matchMedia("(hover:hover)").matches) { e.preventDefault(); $("form").requestSubmit(); } });
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const t = input.value.trim();
+  if (!t) { openVoice(); return; }
+  if (go.disabled) return;
+  input.value = ""; input.style.height = "auto"; go.classList.remove("has"); ask(t);
+});
+home();
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>
