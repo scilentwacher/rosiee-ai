@@ -101,6 +101,25 @@ textarea::placeholder{color:var(--muted)}
 .sw:checked{background:var(--p)}.sw:checked::after{left:21px}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;border:1px solid var(--line);border-radius:999px;padding:8px 16px;z-index:50;display:none;font-size:.9rem}#toast.on{display:block}
 #go .st{display:none}#go.busy .st{display:block}#go.busy .mi,#go.busy .ar{display:none}
+.pic{display:block;width:180px;max-width:100%;border-radius:12px;margin:0 0 8px}
+#atts{display:none;gap:8px;overflow-x:auto;padding:4px 14px 8px}
+#atts.on{display:flex}
+.at{position:relative;flex:none}
+.at img{width:58px;height:58px;object-fit:cover;border-radius:12px;display:block}
+.at.f{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:8px 34px 8px 12px;font-size:.85rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
+.at button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:#333;color:#fff;font-size:.7rem;line-height:1;display:grid;place-items:center}
+.at.f button{top:50%;right:6px;transform:translateY(-50%)}
+#sheet{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.6);display:none;align-items:flex-end}
+#sheet.on{display:flex}
+.panel{width:100%;background:#161616;border-radius:28px 28px 0 0;padding:14px 16px calc(20px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ph b{flex:1;text-align:center}
+.tl3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.tl3 button,.prow{background:var(--card);border:1px solid var(--line);border-radius:18px;color:var(--ink)}
+.tl3 button{padding:16px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.tl3 .ci{width:46px;height:46px;border-radius:50%;background:var(--card2);display:grid;place-items:center}
+.tl3 svg,.prow svg{width:22px;height:22px}
+.prow{width:100%;display:flex;align-items:center;gap:14px;padding:12px 14px;text-align:left;font-size:1rem}
 :focus-visible{outline:2px solid var(--p);outline-offset:2px}
 @keyframes bob{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
 @keyframes pulse{50%{transform:scale(1.08)}}
@@ -128,8 +147,9 @@ textarea::placeholder{color:var(--muted)}
   <button data-p="Give me practical career advice. Ask me about my situation first."><i>↗</i>Career</button>
   <button data-p="Help me plan a trip. Ask me where, when and my budget."><i>⌂</i>Travel</button>
 </div>
+<div id="atts"></div>
 <form id="form">
-  <button class="plus" type="button" data-act="newchat" aria-label="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button class="plus" type="button" data-act="sheet" aria-label="Add to chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
   <textarea id="input" rows="1" placeholder="Message…" aria-label="Message"></textarea>
   <button id="go" type="submit" aria-label="Send or speak">
     <svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
@@ -149,6 +169,18 @@ textarea::placeholder{color:var(--muted)}
     <button class="icon" id="vx" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
 </div>
+<div id="sheet"><div class="panel" role="dialog" aria-label="Add to chat">
+  <div class="ph"><button class="icon" data-act="sclose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><b>Add to chat</b><span style="width:44px"></span></div>
+  <div class="tl3">
+    <button data-act="cam"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>Camera</button>
+    <button data-act="pho"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg></span>Photos</button>
+    <button data-act="fil"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 17v-6M9.5 13.5L12 11l2.5 2.5"/></svg></span>Files</button>
+  </div>
+  <button class="prow" data-act="newchat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New chat</button>
+</div></div>
+<input type="file" id="fcam" accept="image/*" capture="environment" hidden>
+<input type="file" id="fpho" accept="image/*" multiple hidden>
+<input type="file" id="ffile" accept=".txt,.md,.csv,.json,.js,.ts,.py,.java,.c,.cpp,.html,.css,.xml,.log,.yml,.yaml,.sql,text/*" hidden>
 <div id="settings" role="dialog" aria-label="Settings">
   <div class="shead"><button class="icon" id="sback" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><b>Settings</b><span style="width:44px"></span></div>
   <div class="sbody">
@@ -173,7 +205,7 @@ textarea::placeholder{color:var(--muted)}
 const PROXY_URL = "https://rossie-ai.shinermathew.workers.dev";
 const $ = id => document.getElementById(id);
 const log = $("log"), input = $("input"), go = $("go"), chips = $("chips");
-let history = [], chatId = null, speakAll = false, busy = false, ctrl = null;
+let history = [], chatId = null, speakAll = false, busy = false, ctrl = null, att = {imgs:[], file:null};
 const DEF = {name:"", avatar:"", tone:"default", warmth:true, enth:true, lists:true, emoji:true, custom:"", lang:"auto", memOn:true, mem:[]};
 const LANGS = {auto:["Auto",""], en:["English","en-US"], hi:["Hindi","hi-IN"], ml:["Malayalam","ml-IN"], ta:["Tamil","ta-IN"], te:["Telugu","te-IN"], ar:["Arabic","ar-SA"], es:["Spanish","es-ES"], fr:["French","fr-FR"]};
 let S = Object.assign({}, DEF, (() => { try { return JSON.parse(localStorage.getItem("rossie-set") || "{}"); } catch (e) { return {}; } })());
@@ -213,7 +245,7 @@ function saveChat(){
   if (!history.length) return;
   const a = load(); if (!chatId) chatId = Date.now().toString(36);
   const i = a.findIndex(c => c.id === chatId), old = i >= 0 ? a[i] : null;
-  const rec = {id:chatId, title:old ? old.title : history[0].content.slice(0, 48), pin:old ? !!old.pin : false, msgs:history};
+  const rec = {id:chatId, title:old ? old.title : (history[0].shown || history[0].content).split("\n")[0].slice(0, 48), pin:old ? !!old.pin : false, msgs:history.map(m => ({role:m.role, content:m.content, shown:m.shown}))};
   if (i >= 0) a[i] = rec; else a.unshift(rec);
   store(a);
 }
@@ -222,20 +254,22 @@ function renderList(){
   $("hlist").innerHTML = a.length ? a.map(c => '<div class="h-item"><button class="h-del" data-act="pin" data-id="' + c.id + '" aria-label="Pin" style="' + (c.pin ? "color:#ffcf5a" : "") + '">' + (c.pin ? "★" : "☆") + '</button><button class="h-title" data-act="open" data-id="' + c.id + '">' + esc(c.title) + '</button><button class="h-del" data-act="ren" data-id="' + c.id + '" aria-label="Rename">✎</button><button class="h-del" data-act="del" data-id="' + c.id + '" aria-label="Delete">✕</button></div>').join("") : '<p class="empty">No saved chats yet.</p>';
 }
 function menu(on){ if (on) { renderList(); paintAll(); $("shr").style.display = history.length ? "flex" : "none"; } $("drawer").classList.toggle("on", on); }
-function chatText(){ return history.map(m => (m.role === "user" ? (S.name || "You") : "Rossie") + ": " + m.content).join("\n\n") + "\n\n— Rossie AI by Shine R Mathew"; }
+function chatText(){ return history.map(m => (m.role === "user" ? (S.name || "You") : "Rossie") + ": " + (m.shown || m.content)).join("\n\n") + "\n\n— Rossie AI by Shine R Mathew"; }
 
 /* screens */
 function home(){
-  history = []; chatId = null;
+  history = []; chatId = null; att = {imgs:[], file:null}; renderAtts();
   log.innerHTML = '<section id="hero"><canvas id="orb"></canvas><p class="hi">' + esc(greet()) + '</p><h2>How can I help you today?</h2><p class="by">Made by <a href="https://www.instagram.com/iam.sh1ne/" target="_blank" rel="noopener">Shine R Mathew</a> · @iam.sh1ne</p></section>';
   chips.style.display = "";
 }
 function scrollDown(){ log.scrollTop = log.scrollHeight; }
 function start(){ const h = $("hero"); if (h) h.remove(); chips.style.display = "none"; }
-function addMe(text){
+function addMe(text, at){
   start();
   const r = document.createElement("div"); r.className = "row me";
-  const b = document.createElement("div"); b.className = "bubble"; b.textContent = text;
+  const b = document.createElement("div"); b.className = "bubble";
+  if (at && at.imgs) at.imgs.forEach(u => { const im = document.createElement("img"); im.src = u; im.className = "pic"; b.appendChild(im); });
+  const t = document.createElement("div"); t.textContent = text + (at && at.file ? "\n▤ " + at.file.name : ""); b.appendChild(t);
   r.appendChild(b);
   if (S.name || S.avatar) { const a = document.createElement("span"); a.className = "ava"; ini(a); r.appendChild(a); }
   log.appendChild(r); scrollDown();
@@ -256,10 +290,40 @@ function addErr(t){ const d = document.createElement("div"); d.className = "err"
 function openChat(id){
   const c = load().find(x => x.id === id); if (!c) return;
   history = c.msgs.slice(); chatId = id; log.innerHTML = ""; start();
-  for (const m of history) { if (m.role === "user") addMe(m.content); else { const r = addAI(); fill(r, m.content); } }
+  for (const m of history) { if (m.role === "user") addMe(m.shown || m.content); else { const r = addAI(); fill(r, m.content); } }
   scrollDown();
 }
 
+function hasAtt(){ return att.imgs.length > 0 || !!att.file; }
+function renderAtts(){
+  const z = $("atts");
+  z.innerHTML = att.imgs.map((u, i) => '<div class="at"><img src="' + u + '" alt="Photo ' + (i + 1) + '"><button data-act="rmimg" data-id="' + i + '" aria-label="Remove photo">✕</button></div>').join("") + (att.file ? '<div class="at f"><span>▤ ' + esc(att.file.name) + '</span><button data-act="rmfile" aria-label="Remove file">✕</button></div>' : "");
+  z.classList.toggle("on", hasAtt());
+  go.classList.toggle("has", !!input.value.trim() || hasAtt());
+}
+function shrink(f){
+  return new Promise((ok, no) => {
+    const im = new Image();
+    im.onload = () => { const k = Math.min(1, 1024 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(im.src); ok(c.toDataURL("image/jpeg", 0.8)); };
+    im.onerror = () => no(); im.src = URL.createObjectURL(f);
+  });
+}
+async function addImgs(files){
+  for (const f of files) { if (att.imgs.length >= 3) { toast("Max 3 photos"); break; } try { att.imgs.push(await shrink(f)); } catch (e) { toast("Couldn’t read that photo"); } }
+  renderAtts();
+}
+async function addFile(f){
+  if (!f) return;
+  if (f.size > 2e6) { toast("File too large (max 2 MB)"); return; }
+  let t = ""; try { t = await f.text(); } catch (e) {}
+  if (!t || /\u0000/.test(t.slice(0, 2000))) { toast("Only text files for now (txt, md, csv, json, code)"); return; }
+  att.file = {name:f.name.slice(0, 60), text:t.slice(0, 12000) + (t.length > 12000 ? "\n[…truncated]" : "")};
+  renderAtts();
+}
+function sheet(on){ $("sheet").classList.toggle("on", on); }
+$("sheet").addEventListener("click", e => { if (e.target.id === "sheet") sheet(false); });
+$("fcam").onchange = $("fpho").onchange = e => { addImgs([...e.target.files]); e.target.value = ""; };
+$("ffile").onchange = e => { addFile(e.target.files[0]); e.target.value = ""; };
 function setBusy(b){ busy = b; go.classList.toggle("busy", b); }
 function stopGen(){ if (ctrl) ctrl.abort(); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
 function maybeRemember(t){
@@ -267,15 +331,23 @@ function maybeRemember(t){
   const m = t.match(/^\s*(?:please\s+)?remember(?:\s+that)?[:,]?\s+(.{3,200})$/i);
   if (m) { const v = m[1].trim(); if (!S.mem.includes(v)) { S.mem.push(v); S.mem = S.mem.slice(-20); saveS(); toast("Saved to memory"); } }
 }
-async function ask(text, spoken){
+function buildMsgs(){
+  return history.slice(-20).map((m, i, a) => (m.imgs && i === a.length - 1)
+    ? {role:"user", content:[{type:"text", text:m.content}, ...m.imgs.map(u => ({type:"image_url", image_url:{url:u}}))]}
+    : {role:m.role, content:m.content});
+}
+async function ask(text, spoken, at){
   if (busy) return;
   maybeRemember(text);
-  addMe(text); history.push({role:"user", content:text});
+  const imgs = at && at.imgs && at.imgs.length ? at.imgs.slice() : null, file = at && at.file;
+  const content = text + (file ? "\n\n[File: " + file.name + "]\n" + file.text : "") + (imgs ? "\n[photo attached]" : "");
+  const shown = text + (file ? "\n▤ " + file.name : "") + (imgs ? "\n▣ " + imgs.length + " photo" + (imgs.length > 1 ? "s" : "") : "");
+  addMe(text, {imgs, file}); history.push({role:"user", content, shown, imgs});
   setBusy(true); ctrl = new AbortController();
   const row = addAI(), body = row.querySelector(".body"); let out = "", pend = false, fin = false;
   const paint = () => { pend = false; if (fin) return; body.innerHTML = md(out); scrollDown(); };
   try {
-    const res = await fetch(PROXY_URL, {method:"POST", headers:{"Content-Type":"application/json"}, signal:ctrl.signal, body:JSON.stringify({messages:history.slice(-20), stream:true, profile:prof()})});
+    const res = await fetch(PROXY_URL, {method:"POST", headers:{"Content-Type":"application/json"}, signal:ctrl.signal, body:JSON.stringify({messages:buildMsgs(), stream:true, profile:prof()})});
     if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error((d.error && d.error.message) || "Request failed (" + res.status + ")"); }
     const rd = res.body.getReader(), dec = new TextDecoder(); let buf = "";
     for (;;) {
@@ -387,7 +459,14 @@ document.addEventListener("click", e => {
   if (el.dataset.p) { ask(el.dataset.p); return; }
   const a = el.dataset.act, id = el.dataset.id;
   if (a === "menu") menu(true);
-  else if (a === "newchat") { menu(false); home(); }
+  else if (a === "newchat") { menu(false); sheet(false); home(); }
+  else if (a === "sheet") sheet(true);
+  else if (a === "sclose") sheet(false);
+  else if (a === "cam") { sheet(false); $("fcam").click(); }
+  else if (a === "pho") { sheet(false); $("fpho").click(); }
+  else if (a === "fil") { sheet(false); $("ffile").click(); }
+  else if (a === "rmimg") { att.imgs.splice(+id, 1); renderAtts(); }
+  else if (a === "rmfile") { att.file = null; renderAtts(); }
   else if (a === "open") { menu(false); openChat(id); }
   else if (a === "del") { if (confirm("Delete this chat?")) { store(load().filter(c => c.id !== id)); renderList(); } }
   else if (a === "pin") { const l = load(), c = l.find(x => x.id === id); if (c) { c.pin = !c.pin; store(l); renderList(); } }
@@ -409,10 +488,11 @@ input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey &&
 $("form").addEventListener("submit", e => {
   e.preventDefault();
   if (busy) { stopGen(); return; }
-  const t = input.value.trim();
-  if (!t) { openVoice(); return; }
-  if (go.disabled) return;
-  input.value = ""; input.style.height = "auto"; go.classList.remove("has"); ask(t);
+  let t = input.value.trim();
+  if (!t && !hasAtt()) { openVoice(); return; }
+  if (!t) t = att.imgs.length ? "What is in this photo?" : "Summarize this file.";
+  const at = {imgs:att.imgs, file:att.file}; att = {imgs:[], file:null};
+  input.value = ""; input.style.height = "auto"; renderAtts(); ask(t, false, at);
 });
 function memList(){ $("memlist").innerHTML = S.mem.map((m, i) => '<div class="memi"><span>' + esc(m) + '</span><button class="h-del" data-act="rmmem" data-id="' + i + '" aria-label="Forget">✕</button></div>').join(""); }
 function openSet(){
