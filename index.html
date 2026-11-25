@@ -324,6 +324,7 @@ function sheet(on){ $("sheet").classList.toggle("on", on); }
 $("sheet").addEventListener("click", e => { if (e.target.id === "sheet") sheet(false); });
 $("fcam").onchange = $("fpho").onchange = e => { addImgs([...e.target.files]); e.target.value = ""; };
 $("ffile").onchange = e => { addFile(e.target.files[0]); e.target.value = ""; };
+function noThink(t){ return t.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").replace(/^\s+/, ""); }
 function setBusy(b){ busy = b; go.classList.toggle("busy", b); }
 function stopGen(){ if (ctrl) ctrl.abort(); if ("speechSynthesis" in window) speechSynthesis.cancel(); }
 function maybeRemember(t){
@@ -345,7 +346,7 @@ async function ask(text, spoken, at){
   addMe(text, {imgs, file}); history.push({role:"user", content, shown, imgs});
   setBusy(true); ctrl = new AbortController();
   const row = addAI(), body = row.querySelector(".body"); let out = "", pend = false, fin = false;
-  const paint = () => { pend = false; if (fin) return; body.innerHTML = md(out); scrollDown(); };
+  const paint = () => { pend = false; if (fin) return; body.innerHTML = md(noThink(out)); scrollDown(); };
   try {
     const res = await fetch(PROXY_URL, {method:"POST", headers:{"Content-Type":"application/json"}, signal:ctrl.signal, body:JSON.stringify({messages:buildMsgs(), stream:true, profile:prof()})});
     if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error((d.error && d.error.message) || "Request failed (" + res.status + ")"); }
@@ -366,7 +367,7 @@ async function ask(text, spoken, at){
       return;
     }
   }
-  fin = true; fill(row, out); history.push({role:"assistant", content:out}); saveChat();
+  out = noThink(out) || out; fin = true; fill(row, out); history.push({role:"assistant", content:out}); saveChat();
   if ((spoken || speakAll) && !ctrl.signal.aborted) speak(out);
   setBusy(false); scrollDown();
 }
