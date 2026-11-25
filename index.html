@@ -25,6 +25,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 #orb{width:min(58vw,230px);aspect-ratio:1;filter:drop-shadow(0 0 22px rgba(200,80,255,.45));margin-bottom:14px}
 .hi{margin:0;color:var(--muted);font-size:.95rem}
 h2{margin:6px 0 0;font-size:2.05rem;line-height:1.15;font-weight:600;max-width:12ch}
+.by{margin:12px 0 0;font-size:.75rem;color:var(--muted);opacity:.8}
+.by a{color:#d9b3ff;text-decoration:none}
 .row{display:flex;gap:10px;align-items:flex-start;max-width:100%}
 .row.me{justify-content:flex-end}
 .bubble{background:linear-gradient(135deg,#8a3dff,#c04dff);color:#fff;border-radius:20px 20px 6px 20px;padding:10px 15px;max-width:85%;white-space:pre-wrap;word-wrap:break-word}
@@ -163,7 +165,7 @@ function menu(on){ if (on) renderList(); $("drawer").classList.toggle("on", on);
 /* screens */
 function home(){
   history = []; chatId = null;
-  log.innerHTML = '<section id="hero"><canvas id="orb"></canvas><p class="hi">Hi, I’m Rossie!</p><h2>How can I help you today?</h2></section>';
+  log.innerHTML = '<section id="hero"><canvas id="orb"></canvas><p class="hi">Hi, I’m Rossie!</p><h2>How can I help you today?</h2><p class="by">Made by <a href="https://www.instagram.com/iam.sh1ne/" target="_blank" rel="noopener">Shine R Mathew</a> · @iam.sh1ne</p></section>';
   chips.style.display = "";
 }
 function scrollDown(){ log.scrollTop = log.scrollHeight; }
